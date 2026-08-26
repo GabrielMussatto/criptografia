@@ -2,8 +2,8 @@ import unicodedata
 
 # configuraçoes de texto criptografado e chave
 
-TEXTO = "SEGURANCA"
-CHAVE = "REDE"
+TEXTO = "A CRIPTOGRAFIA POSSIBILITA PROTEGER INFORMACOES IMPORTANTES"
+CHAVE = "CHAVE"
 
 # normalizando o texto
 def normalizar(texto):
@@ -55,7 +55,7 @@ def substituir(texto, chave):
 
 #Transposiçao
 #o tamanho de cada bloco é definido pelo tamanho da chave
-#blocos impares serao invertidos, blocos pares mantidos
+#blocos pares serao invertidos, blocos impares mantidos
 def transpor(texto, tamanho_bloco):
     resultado = ""
     numero_bloco = 1
@@ -63,8 +63,8 @@ def transpor(texto, tamanho_bloco):
     for inicio in range(0, len(texto), tamanho_bloco):
         bloco = texto[inicio:inicio + tamanho_bloco]
 
-        #se o numero do bloco for impar, inverte
-        if numero_bloco % 2 != 0:
+        #se o numero do bloco for par, inverte
+        if numero_bloco % 2 == 0:
             bloco = bloco[::-1]
 
         resultado += bloco

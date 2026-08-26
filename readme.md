@@ -169,8 +169,8 @@ o tamanho dos blocos será:
 
 A transposição segue uma regra alternada:
 
-* blocos **ímpares** são invertidos;
-* blocos **pares** permanecem na ordem original.
+* blocos **ímpares** permanecem na ordem original;
+* blocos **pares** são invertidos.
 
 ### Exemplo
 
@@ -189,21 +189,21 @@ JJLB | MJWN | Z
 Aplicação da transposição:
 
 ```text
-Bloco 1 → JJLB → BLJJ
-Bloco 2 → MJWN → MJWN
+Bloco 1 → JJLB → JJLB
+Bloco 2 → MJWN → NWJM
 Bloco 3 → Z    → Z
 ```
 
 Resultado:
 
 ```text
-BLJJ | MJWN | Z
+JJLB | NWJM | Z
 ```
 
 Texto cifrado:
 
 ```text
-BLJJMJWNZ
+JJLBNWJMZ
 ```
 
 ---
@@ -243,18 +243,18 @@ Em seguida, são criados os blocos:
 JJLB | MJWN | Z
 ```
 
-Os blocos ímpares são invertidos:
+Os blocos ímpares são mantidos e os blocos pares são invertidos:
 
 ```text
-BLJJ | MJWN | Z
+JJLB | NWJM | Z
 ```
 
 Portanto:
 
 ```text
-Texto claro:  SEGURANCA
-Chave:        REDE
-Texto cifrado: BLJJMJWNZ
+Texto claro:   SEGURANCA
+Chave:         REDE
+Texto cifrado: JJLBNWJMZ
 ```
 
 ---
@@ -268,20 +268,20 @@ Primeiramente, é desfeita a transposição.
 Texto recebido:
 
 ```text
-BLJJMJWNZ
+JJLBNWJMZ
 ```
 
 Divisão em blocos:
 
 ```text
-BLJJ | MJWN | Z
+JJLB | NWJM | Z
 ```
 
-Aplicando novamente a regra aos blocos ímpares:
+Aplicando novamente a regra de transposição:
 
 ```text
-BLJJ → JJLB
-MJWN → MJWN
+JJLB → JJLB
+NWJM → MJWN
 Z    → Z
 ```
 
@@ -306,7 +306,7 @@ SEGURANCA
 Portanto:
 
 ```text
-BLJJMJWNZ + REDE
+JJLBNWJMZ + REDE
         ↓
     SEGURANCA
 ```
@@ -333,10 +333,24 @@ Resultado da substituição:
 JJLBMJWNZ
 ```
 
+Divisão em blocos:
+
+```text
+JJLB | MJWN | Z
+```
+
+Aplicação da transposição:
+
+```text
+Bloco 1 (ímpar) → mantém  → JJLB
+Bloco 2 (par)   → inverte → NWJM
+Bloco 3 (ímpar) → mantém  → Z
+```
+
 Após a transposição:
 
 ```text
-BLJJMJWNZ
+JJLBNWJMZ
 ```
 
 ---
@@ -431,12 +445,12 @@ O algoritmo combina diferentes elementos:
 * influência da posição do caractere;
 * aritmética modular;
 * transposição por blocos;
-* alternância entre blocos invertidos e não invertidos;
+* alternância entre blocos mantidos e invertidos;
 * processo reversível de encriptação e decriptação.
 
 A utilização da posição do caractere faz com que a substituição não utilize um único deslocamento constante durante toda a mensagem.
 
-Além disso, a etapa de transposição modifica a posição dos caracteres após a substituição.
+Além disso, a etapa de transposição modifica a posição dos caracteres após a substituição. Os blocos ímpares são mantidos em sua ordem original, enquanto os blocos pares são invertidos.
 
 ---
 
@@ -490,9 +504,10 @@ Este algoritmo **não deve ser utilizado para proteger senhas, documentos, dados
 Ele foi desenvolvido exclusivamente para **estudo e demonstração de conceitos de criptografia**.
 
 ---
+
 ## 👥 Colaboradores
 
 Este projeto foi desenvolvido por:
 
-- [**Gabriel Mussatto**](https://github.com/GabrielMussatto)
-- [**Erick Meneses**](https://github.com/MenesesErick)
+* [**Gabriel Mussatto**](https://github.com/GabrielMussatto)
+* [**Erick Meneses**](https://github.com/MenesesErick)
