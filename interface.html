@@ -660,23 +660,15 @@
         <div class="pipeline">
           <div class="step enc-step" id="step-normalizado">
             <div class="step-header">
-              <span class="step-label enc-color">① Normalizado</span>
+              <span class="step-label enc-color">① Texto Normalizado</span>
               <button class="copy-btn" onclick="copiar('val-normalizado', this)">📋 Copiar</button>
             </div>
             <div class="step-value" id="val-normalizado">—</div>
           </div>
 
-          <div class="step enc-step" id="step-substituido">
-            <div class="step-header">
-              <span class="step-label enc-color">② Após Substituição <span style="opacity:.6;font-size:10px;">(Vigenère + índice)</span></span>
-              <button class="copy-btn" onclick="copiar('val-substituido', this)">📋 Copiar</button>
-            </div>
-            <div class="step-value" id="val-substituido">—</div>
-          </div>
-
           <div class="step final-step" id="step-cifrado">
             <div class="step-header">
-              <span class="step-label blue-color">③ Texto Cifrado Final</span>
+              <span class="step-label blue-color">② Texto Cifrado Final</span>
               <button class="copy-btn" onclick="copiar('val-cifrado', this)">📋 Copiar</button>
             </div>
             <div class="step-value" id="val-cifrado">—</div>
@@ -873,7 +865,7 @@
       document.getElementById('enc-texto').value = '';
       hideError('enc-error');
       document.getElementById('enc-result-card').style.display = 'none';
-      ['step-normalizado','step-substituido','step-cifrado'].forEach(id => {
+      ['step-normalizado','step-cifrado'].forEach(id => {
         document.getElementById(id).classList.remove('done');
       });
     }
@@ -897,26 +889,24 @@
       const chave = "CHAVE";
 
       try {
-        const { textoNormalizado, textoSubstituido, textoCifrado } = encriptarAlgo(texto, chave);
+        const { textoNormalizado, textoCifrado } = encriptarAlgo(texto, chave);
 
         // Show result card
         const card = document.getElementById('enc-result-card');
         card.style.display = 'block';
 
         // Reset step animations
-        ['step-normalizado','step-substituido','step-cifrado'].forEach(id => {
+        ['step-normalizado','step-cifrado'].forEach(id => {
           document.getElementById(id).classList.remove('done');
         });
 
         // Populate values
-        document.getElementById('val-normalizado').textContent  = textoNormalizado;
-        document.getElementById('val-substituido').textContent  = textoSubstituido;
-        document.getElementById('val-cifrado').textContent      = textoCifrado;
+        document.getElementById('val-normalizado').textContent = textoNormalizado;
+        document.getElementById('val-cifrado').textContent     = textoCifrado;
 
         // Animate steps with delay
         setTimeout(() => animateStep('step-normalizado'),  80);
-        setTimeout(() => animateStep('step-substituido'), 280);
-        setTimeout(() => animateStep('step-cifrado'),     480);
+        setTimeout(() => animateStep('step-cifrado'),     280);
 
         card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
