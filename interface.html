@@ -749,6 +749,49 @@
     .eye-btn:hover {
       opacity: 1;
     }
+
+    /* ===== HISTÓRICO ===== */
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .history-item {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+    }
+
+    .history-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .history-field-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .history-field-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13.5px;
+      color: var(--text-primary);
+      word-break: break-all;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 600px) {
+      .history-row {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 
@@ -768,13 +811,13 @@
         <div class="logo-icon">🔐</div>
         <span class="logo-text">CriptoCipher</span>
       </div>
-      <p class="tagline">Encriptação e decriptação via Vigenère + Transposição de Blocos</p>
+      <!-- <p class="tagline">Encriptação e decriptação via Vigenère + Transposição de Blocos</p>
       <div class="badge-row">
         <span class="badge badge-cyan">⚡ Vigenère Modificado</span>
         <span class="badge badge-blue">🔄 Transposição de Blocos</span>
         <span class="badge badge-teal">🔑 Chave Personalizada</span>
-      </div>
-    </header>
+      </div>-->
+    </header> 
 
     <!-- Tabs -->
     <div class="tabs" role="tablist">
@@ -838,6 +881,20 @@
             <div class="step-value" id="val-cifrado">—</div>
           </div>
         </div>
+      </div>
+
+
+      <!-- History card -->
+      <div class="card" id="enc-history-card" style="display:none;">
+        <div class="card-header">
+          <div class="card-icon cyan">🕘</div>
+          <div>
+            <div class="card-title">Histórico</div>
+            <div class="card-subtitle">Textos encriptados nesta sessão</div>
+          </div>
+        </div>
+
+        <div class="history-list" id="enc-history-list"></div>
       </div>
 
     </div>
@@ -1041,6 +1098,45 @@
       });
     }
 
+
+    function adicionarHistorico(textoOriginal, textoCifrado) {
+      const card = document.getElementById('enc-history-card');
+      const lista = document.getElementById('enc-history-list');
+
+      const item = document.createElement('div');
+      item.className = 'history-item';
+
+      const linha = document.createElement('div');
+      linha.className = 'history-row';
+
+      const campoOriginal = document.createElement('div');
+      const labelOriginal = document.createElement('div');
+      labelOriginal.className = 'history-field-label';
+      labelOriginal.textContent = 'Texto original';
+      const valorOriginal = document.createElement('div');
+      valorOriginal.className = 'history-field-value';
+      valorOriginal.textContent = textoOriginal;
+      campoOriginal.appendChild(labelOriginal);
+      campoOriginal.appendChild(valorOriginal);
+
+      const campoCifrado = document.createElement('div');
+      const labelCifrado = document.createElement('div');
+      labelCifrado.className = 'history-field-label';
+      labelCifrado.textContent = 'Texto cifrado';
+      const valorCifrado = document.createElement('div');
+      valorCifrado.className = 'history-field-value';
+      valorCifrado.textContent = textoCifrado;
+      campoCifrado.appendChild(labelCifrado);
+      campoCifrado.appendChild(valorCifrado);
+
+      linha.appendChild(campoOriginal);
+      linha.appendChild(campoCifrado);
+      item.appendChild(linha);
+
+      lista.prepend(item);
+      card.style.display = 'block';
+    }
+
     /* =============================================
        MAIN ACTIONS
     ============================================= */
@@ -1062,6 +1158,9 @@
 
         // Populate value
         document.getElementById('val-cifrado').textContent = textoCifrado;
+
+        // Adiciona ao histórico somente o texto original e o texto cifrado
+        adicionarHistorico(texto, textoCifrado);
 
         // Animate step
         setTimeout(() => animateStep('step-cifrado'), 80);
