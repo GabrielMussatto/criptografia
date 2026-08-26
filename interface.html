@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CriptoCipher — Encriptador & Decriptador</title>
+  <meta name="description" content="Interface web para encriptação e decriptação de mensagens usando cifra de Vigenère com transposição de blocos." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-deep:      #f0f4f8;
+      --bg-dark:      #ffffff;
+      --bg-card:      #ffffff;
+      --bg-card-alt:  #f8fafc;
+      --border:       rgba(99, 132, 180, 0.18);
+      --border-focus: rgba(56, 130, 220, 0.5);
+      --accent-cyan:  #0ea5e9;
+      --accent-blue:  #4f46e5;
+      --accent-teal:  #0d9488;
+      --accent-rose:  #e11d48;
+      --accent-green: #16a34a;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted:   #94a3b8;
+      --glow-cyan:    0 0 20px rgba(14, 165, 233, 0.15);
+      --glow-blue:    0 0 20px rgba(79, 70, 229, 0.15);
+      --glow-teal:    0 0 20px rgba(13, 148, 136, 0.15);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-deep);
+      background-image: linear-gradient(135deg, #f0f4f8 0%, #e8f0fe 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ===== ANIMATED BACKGROUND ===== */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(14, 165, 233, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(14, 165, 233, 0.05) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .bg-glow {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .bg-glow-1 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(14, 165, 233, 0.08) 0%, transparent 70%);
+      top: -100px; left: -100px;
+      animation: float1 12s ease-in-out infinite alternate;
+    }
+    .bg-glow-2 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(79, 70, 229, 0.07) 0%, transparent 70%);
+      bottom: -80px; right: -80px;
+      animation: float2 10s ease-in-out infinite alternate;
+    }
+    .bg-glow-3 {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(13, 148, 136, 0.06) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      animation: float3 15s ease-in-out infinite alternate;
+    }
+
+    @keyframes float1 { to { transform: translate(30px, 40px); } }
+    @keyframes float2 { to { transform: translate(-30px, -20px); } }
+    @keyframes float3 { to { transform: translate(-50%, -60%); } }
+
+    /* ===== LAYOUT ===== */
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    /* ===== HEADER ===== */
+    header {
+      text-align: center;
+      margin-bottom: 52px;
+    }
+
+    .logo-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .logo-icon {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      box-shadow: var(--glow-cyan), inset 0 1px 0 rgba(255,255,255,0.1);
+      animation: pulse-logo 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse-logo {
+      0%, 100% { box-shadow: var(--glow-cyan), inset 0 1px 0 rgba(255,255,255,0.1); }
+      50%       { box-shadow: 0 0 35px rgba(56,189,248,0.45), inset 0 1px 0 rgba(255,255,255,0.1); }
+    }
+
+    .logo-text {
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue) 60%, var(--accent-teal));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+    }
+
+    .tagline {
+      color: var(--text-secondary);
+      font-size: 15px;
+      font-weight: 400;
+      letter-spacing: 0.3px;
+    }
+
+    .badge-row {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      border: 1px solid;
+    }
+    .badge-cyan  { color: var(--accent-cyan); border-color: rgba(56,189,248,0.25); background: rgba(56,189,248,0.07); }
+    .badge-blue  { color: var(--accent-blue); border-color: rgba(99,102,241,0.25); background: rgba(99,102,241,0.07); }
+    .badge-teal  { color: var(--accent-teal); border-color: rgba(45,212,191,0.25); background: rgba(45,212,191,0.07); }
+
+    /* ===== TABS ===== */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 6px;
+      margin-bottom: 32px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px 20px;
+      border: none;
+      background: transparent;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .tab-btn:hover:not(.active) {
+      color: var(--text-primary);
+      background: rgba(255,255,255,0.04);
+    }
+
+    .tab-btn.active {
+      color: var(--bg-deep);
+      font-weight: 600;
+    }
+
+    .tab-btn.active.enc {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+      box-shadow: 0 4px 15px rgba(56,189,248,0.3);
+    }
+
+    .tab-btn.active.dec {
+      background: linear-gradient(135deg, var(--accent-teal), #34d399);
+      box-shadow: 0 4px 15px rgba(45,212,191,0.3);
+    }
+
+    /* ===== CARDS ===== */
+    .panel {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    .panel.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 12px rgba(15, 23, 42, 0.07), 0 1px 3px rgba(15,23,42,0.05);
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .card:hover { border-color: rgba(14,165,233,0.35); box-shadow: 0 4px 20px rgba(14,165,233,0.1); }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    .card-icon {
+      width: 36px; height: 36px;
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .card-icon.cyan { background: rgba(56,189,248,0.12); }
+    .card-icon.teal { background: rgba(45,212,191,0.12); }
+    .card-icon.blue { background: rgba(99,102,241,0.12); }
+    .card-icon.rose { background: rgba(244,63,94,0.12); }
+    .card-icon.green{ background: rgba(74,222,128,0.12); }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .card-subtitle {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ===== FORM ELEMENTS ===== */
+    .field-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 600px) {
+      .field-group { grid-template-columns: 1fr; }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    textarea, input[type="text"] {
+      width: 100%;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: var(--text-primary);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13.5px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      resize: vertical;
+    }
+
+    textarea { min-height: 110px; }
+
+    textarea:focus, input[type="text"]:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(56,189,248,0.08);
+    }
+
+    textarea::placeholder, input::placeholder {
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* ===== BUTTON ===== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 13px 28px;
+      border: none;
+      border-radius: 11px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.22s ease;
+      letter-spacing: 0.2px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0);
+      transition: background 0.2s;
+    }
+
+    .btn:hover::after { background: rgba(255,255,255,0.07); }
+    .btn:active { transform: scale(0.97); }
+
+    .btn-enc {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(56,189,248,0.3);
+    }
+
+    .btn-dec {
+      background: linear-gradient(135deg, var(--accent-teal), #34d399);
+      color: #082119;
+      box-shadow: 0 4px 20px rgba(45,212,191,0.3);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 12px 18px;
+      font-size: 13px;
+    }
+    .btn-ghost:hover { border-color: var(--border-focus); color: var(--text-primary); }
+
+    /* ===== STEPS PIPELINE ===== */
+    .pipeline {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .step {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      opacity: 0.4;
+      transform: translateX(-4px);
+    }
+
+    .step.done {
+      opacity: 1;
+      transform: translateX(0);
+      transition: opacity 0.4s ease, transform 0.4s ease, border-color 0.3s;
+    }
+
+    .step.done.enc-step  { border-color: rgba(56,189,248,0.35); box-shadow: var(--glow-cyan); }
+    .step.done.dec-step  { border-color: rgba(45,212,191,0.35); box-shadow: var(--glow-teal); }
+    .step.done.final-step{ border-color: rgba(99,102,241,0.45); box-shadow: var(--glow-blue); }
+
+    .step-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .step-label.enc-color  { color: var(--accent-cyan); }
+    .step-label.dec-color  { color: var(--accent-teal); }
+    .step-label.blue-color { color: var(--accent-blue); }
+
+    .step-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13.5px;
+      color: var(--text-primary);
+      word-break: break-all;
+      line-height: 1.6;
+    }
+
+    /* ===== COPY BUTTON ===== */
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 11.5px;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+    .copy-btn:hover { color: var(--accent-cyan); border-color: var(--accent-cyan); }
+    .copy-btn.copied { color: var(--accent-green); border-color: var(--accent-green); }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    /* ===== ERROR ===== */
+    .error-msg {
+      background: rgba(244,63,94,0.1);
+      border: 1px solid rgba(244,63,94,0.3);
+      color: #fca5a5;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px;
+      display: none;
+      margin-top: 16px;
+      animation: fadeIn 0.25s ease;
+    }
+    .error-msg.show { display: flex; align-items: center; gap: 8px; }
+
+    /* ===== LOADING SPINNER ===== */
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    .btn.loading .spinner { display: block; }
+    .btn.loading .btn-label { opacity: 0.7; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===== INFO PANEL ===== */
+    .algo-info {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px 28px;
+      margin-top: 28px;
+    }
+
+    .algo-info h3 {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 16px;
+    }
+
+    .algo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    .algo-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .algo-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+    .dot-cyan  { background: var(--accent-cyan);  box-shadow: 0 0 8px var(--accent-cyan); }
+    .dot-blue  { background: var(--accent-blue);  box-shadow: 0 0 8px var(--accent-blue); }
+    .dot-teal  { background: var(--accent-teal);  box-shadow: 0 0 8px var(--accent-teal); }
+
+    .algo-item-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 3px;
+    }
+    .algo-item-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* ===== FORMULA ===== */
+    .formula-box {
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--accent-cyan);
+      margin-top: 8px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background decorations -->
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+  <div class="bg-glow bg-glow-3"></div>
+
+  <div class="wrapper">
+
+    <!-- Header -->
+    <header>
+      <div class="logo-wrap">
+        <div class="logo-icon">🔐</div>
+        <span class="logo-text">CriptoCipher</span>
+      </div>
+      <p class="tagline">Encriptação e decriptação via Vigenère + Transposição de Blocos</p>
+      <div class="badge-row">
+        <span class="badge badge-cyan">⚡ Vigenère Modificado</span>
+        <span class="badge badge-blue">🔄 Transposição de Blocos</span>
+        <span class="badge badge-teal">🔑 Chave Personalizada</span>
+      </div>
+    </header>
+
+    <!-- Tabs -->
+    <div class="tabs" role="tablist">
+      <button id="tab-enc" class="tab-btn active enc" role="tab" onclick="switchTab('enc')">
+        🔒 <span>Encriptar</span>
+      </button>
+      <button id="tab-dec" class="tab-btn dec" role="tab" onclick="switchTab('dec')">
+        🔓 <span>Decriptar</span>
+      </button>
+    </div>
+
+    <!-- ===== ENCRIPTAÇÃO PANEL ===== -->
+    <div id="panel-enc" class="panel active">
+
+      <!-- Input card -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon cyan">📝</div>
+          <div>
+            <div class="card-title">Dados de Entrada</div>
+            <div class="card-subtitle">Informe o texto e a chave para encriptação</div>
+          </div>
+        </div>
+
+        <div class="field full" style="margin-bottom:16px;">
+          <label for="enc-texto">Texto original</label>
+          <textarea id="enc-texto" placeholder="Digite a mensagem que deseja encriptar…"></textarea>
+        </div>
+
+        <div class="field-group">
+          <div class="field">
+            <label for="enc-chave">Chave</label>
+            <input id="enc-chave" type="text" placeholder="Ex: CHAVE" />
+          </div>
+          <div class="field" style="justify-content:flex-end;">
+            <label>&nbsp;</label>
+            <div style="font-size:12px; color: var(--text-muted); line-height:1.5; padding:10px 0;">
+              A chave pode conter qualquer letra.<br>Espaços e acentos são ignorados.
+            </div>
+          </div>
+        </div>
+
+        <div class="error-msg" id="enc-error">⚠️ <span id="enc-error-msg"></span></div>
+
+        <div class="btn-row">
+          <button id="btn-enc" class="btn btn-enc" onclick="encriptar()">
+            <div class="spinner"></div>
+            <span class="btn-label">🔒 Encriptar mensagem</span>
+          </button>
+          <button class="btn btn-ghost" onclick="limparEnc()">✕ Limpar</button>
+        </div>
+      </div>
+
+      <!-- Results card -->
+      <div class="card" id="enc-result-card" style="display:none;">
+        <div class="card-header">
+          <div class="card-icon blue">✨</div>
+          <div>
+            <div class="card-title">Resultado do Processamento</div>
+            <div class="card-subtitle">Etapas aplicadas durante a encriptação</div>
+          </div>
+        </div>
+
+        <div class="pipeline">
+          <div class="step enc-step" id="step-normalizado">
+            <div class="step-header">
+              <span class="step-label enc-color">① Normalizado</span>
+              <button class="copy-btn" onclick="copiar('val-normalizado', this)">📋 Copiar</button>
+            </div>
+            <div class="step-value" id="val-normalizado">—</div>
+          </div>
+
+          <div class="step enc-step" id="step-substituido">
+            <div class="step-header">
+              <span class="step-label enc-color">② Após Substituição <span style="opacity:.6;font-size:10px;">(Vigenère + índice)</span></span>
+              <button class="copy-btn" onclick="copiar('val-substituido', this)">📋 Copiar</button>
+            </div>
+            <div class="step-value" id="val-substituido">—</div>
+          </div>
+
+          <div class="step final-step" id="step-cifrado">
+            <div class="step-header">
+              <span class="step-label blue-color">③ Texto Cifrado Final</span>
+              <button class="copy-btn" onclick="copiar('val-cifrado', this)">📋 Copiar</button>
+            </div>
+            <div class="step-value" id="val-cifrado">—</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== DECRIPTAÇÃO PANEL ===== -->
+    <div id="panel-dec" class="panel">
+
+      <!-- Input card -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon teal">🔍</div>
+          <div>
+            <div class="card-title">Dados de Entrada</div>
+            <div class="card-subtitle">Informe o texto cifrado e a chave para decriptação</div>
+          </div>
+        </div>
+
+        <div class="field full" style="margin-bottom:16px;">
+          <label for="dec-texto">Texto cifrado</label>
+          <textarea id="dec-texto" placeholder="Cole aqui o texto cifrado…"></textarea>
+        </div>
+
+        <div class="field-group">
+          <div class="field">
+            <label for="dec-chave">Chave</label>
+            <input id="dec-chave" type="text" placeholder="Ex: CHAVE" />
+          </div>
+          <div class="field" style="justify-content:flex-end;">
+            <label>&nbsp;</label>
+            <div style="font-size:12px; color: var(--text-muted); line-height:1.5; padding:10px 0;">
+              Use a mesma chave utilizada<br>na encriptação original.
+            </div>
+          </div>
+        </div>
+
+        <div class="error-msg" id="dec-error">⚠️ <span id="dec-error-msg"></span></div>
+
+        <div class="btn-row">
+          <button id="btn-dec" class="btn btn-dec" onclick="decriptar()">
+            <div class="spinner"></div>
+            <span class="btn-label">🔓 Decriptar mensagem</span>
+          </button>
+          <button class="btn btn-ghost" onclick="limparDec()">✕ Limpar</button>
+        </div>
+      </div>
+
+      <!-- Results card -->
+      <div class="card" id="dec-result-card" style="display:none;">
+        <div class="card-header">
+          <div class="card-icon green">✅</div>
+          <div>
+            <div class="card-title">Resultado do Processamento</div>
+            <div class="card-subtitle">Etapas aplicadas durante a decriptação</div>
+          </div>
+        </div>
+
+        <div class="pipeline">
+          <div class="step dec-step" id="step-sem-transposicao">
+            <div class="step-header">
+              <span class="step-label dec-color">① Após desfazer Transposição</span>
+              <button class="copy-btn" onclick="copiar('val-sem-transposicao', this)">📋 Copiar</button>
+            </div>
+            <div class="step-value" id="val-sem-transposicao">—</div>
+          </div>
+
+          <div class="step final-step" id="step-original">
+            <div class="step-header">
+              <span class="step-label blue-color">② Texto Original Recuperado</span>
+              <button class="copy-btn" onclick="copiar('val-original', this)">📋 Copiar</button>
+            </div>
+            <div class="step-value" id="val-original">—</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+
+  </div><!-- /wrapper -->
+
+
+  <script>
+    /* =============================================
+       ALGORITMOS (portados do Python para JS)
+    ============================================= */
+
+    function normalizar(texto) {
+      texto = texto.toUpperCase();
+      // Remove acentos via NFD decomposition
+      texto = texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      // Mantém somente A-Z
+      texto = texto.replace(/[^A-Z]/g, "");
+      return texto;
+    }
+
+    function substituir(texto, chave) {
+      let resultado = "";
+      for (let i = 0; i < texto.length; i++) {
+        const letraTexto = texto[i];
+        const letraChave = chave[i % chave.length];
+        const valTexto   = letraTexto.charCodeAt(0) - 65;
+        const valChave   = letraChave.charCodeAt(0) - 65;
+        const valCifrado = ((valTexto + valChave + i) % 26 + 26) % 26;
+        resultado += String.fromCharCode(valCifrado + 65);
+      }
+      return resultado;
+    }
+
+    function transpor(texto, tamanhoBloco) {
+      let resultado = "";
+      let numBloco = 1;
+      for (let inicio = 0; inicio < texto.length; inicio += tamanhoBloco) {
+        let bloco = texto.slice(inicio, inicio + tamanhoBloco);
+        if (numBloco % 2 === 0) bloco = bloco.split("").reverse().join("");
+        resultado += bloco;
+        numBloco++;
+      }
+      return resultado;
+    }
+
+    function desfazerSubstituicao(texto, chave) {
+      let resultado = "";
+      for (let i = 0; i < texto.length; i++) {
+        const letraCifrada = texto[i];
+        const letraChave   = chave[i % chave.length];
+        const valCifrado   = letraCifrada.charCodeAt(0) - 65;
+        const valChave     = letraChave.charCodeAt(0) - 65;
+        const valOriginal  = ((valCifrado - valChave - i) % 26 + 26) % 26;
+        resultado += String.fromCharCode(valOriginal + 65);
+      }
+      return resultado;
+    }
+
+    function encriptarAlgo(texto, chave) {
+      texto = normalizar(texto);
+      chave = normalizar(chave);
+      if (!chave) throw new Error("A chave precisa possuir pelo menos uma letra.");
+      if (!texto) throw new Error("O texto original não pode ficar vazio.");
+      const textoSubstituido = substituir(texto, chave);
+      const textoCifrado     = transpor(textoSubstituido, chave.length);
+      return { textoNormalizado: texto, textoSubstituido, textoCifrado };
+    }
+
+    function decriptarAlgo(textoCifrado, chave) {
+      textoCifrado = normalizar(textoCifrado);
+      chave        = normalizar(chave);
+      if (!chave)       throw new Error("A chave precisa possuir pelo menos uma letra.");
+      if (!textoCifrado) throw new Error("O texto cifrado não pode ficar vazio.");
+      const textoSemTransposicao = transpor(textoCifrado, chave.length);
+      const textoOriginal        = desfazerSubstituicao(textoSemTransposicao, chave);
+      return { textoCifrado, textoSemTransposicao, textoOriginal };
+    }
+
+    /* =============================================
+       UI HELPERS
+    ============================================= */
+
+    function switchTab(tab) {
+      document.getElementById('panel-enc').classList.toggle('active', tab === 'enc');
+      document.getElementById('panel-dec').classList.toggle('active', tab === 'dec');
+      document.getElementById('tab-enc').classList.toggle('active', tab === 'enc');
+      document.getElementById('tab-dec').classList.toggle('active', tab === 'dec');
+    }
+
+    function showError(id, msg) {
+      const el = document.getElementById(id);
+      document.getElementById(id + '-msg').textContent = msg;
+      el.classList.add('show');
+    }
+
+    function hideError(id) {
+      document.getElementById(id).classList.remove('show');
+    }
+
+    function setLoading(btnId, loading) {
+      const btn = document.getElementById(btnId);
+      btn.classList.toggle('loading', loading);
+      btn.disabled = loading;
+    }
+
+    function animateStep(stepId) {
+      const el = document.getElementById(stepId);
+      if (!el) return;
+      setTimeout(() => el.classList.add('done'), 50);
+    }
+
+    function copiar(valueId, btn) {
+      const text = document.getElementById(valueId).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = '✅ Copiado!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.innerHTML = '📋 Copiar';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+
+    function limparEnc() {
+      document.getElementById('enc-texto').value = '';
+      document.getElementById('enc-chave').value = '';
+      hideError('enc-error');
+      document.getElementById('enc-result-card').style.display = 'none';
+      ['step-normalizado','step-substituido','step-cifrado'].forEach(id => {
+        document.getElementById(id).classList.remove('done');
+      });
+    }
+
+    function limparDec() {
+      document.getElementById('dec-texto').value = '';
+      document.getElementById('dec-chave').value = '';
+      hideError('dec-error');
+      document.getElementById('dec-result-card').style.display = 'none';
+      ['step-sem-transposicao','step-original'].forEach(id => {
+        document.getElementById(id).classList.remove('done');
+      });
+    }
+
+    /* =============================================
+       MAIN ACTIONS
+    ============================================= */
+
+    function encriptar() {
+      hideError('enc-error');
+      const texto = document.getElementById('enc-texto').value;
+      const chave = document.getElementById('enc-chave').value;
+
+      try {
+        const { textoNormalizado, textoSubstituido, textoCifrado } = encriptarAlgo(texto, chave);
+
+        // Show result card
+        const card = document.getElementById('enc-result-card');
+        card.style.display = 'block';
+
+        // Reset step animations
+        ['step-normalizado','step-substituido','step-cifrado'].forEach(id => {
+          document.getElementById(id).classList.remove('done');
+        });
+
+        // Populate values
+        document.getElementById('val-normalizado').textContent  = textoNormalizado;
+        document.getElementById('val-substituido').textContent  = textoSubstituido;
+        document.getElementById('val-cifrado').textContent      = textoCifrado;
+
+        // Animate steps with delay
+        setTimeout(() => animateStep('step-normalizado'),  80);
+        setTimeout(() => animateStep('step-substituido'), 280);
+        setTimeout(() => animateStep('step-cifrado'),     480);
+
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      } catch (err) {
+        showError('enc-error', err.message);
+      }
+    }
+
+    function decriptar() {
+      hideError('dec-error');
+      const texto = document.getElementById('dec-texto').value;
+      const chave = document.getElementById('dec-chave').value;
+
+      try {
+        const { textoSemTransposicao, textoOriginal } = decriptarAlgo(texto, chave);
+
+        const card = document.getElementById('dec-result-card');
+        card.style.display = 'block';
+
+        ['step-sem-transposicao','step-original'].forEach(id => {
+          document.getElementById(id).classList.remove('done');
+        });
+
+        document.getElementById('val-sem-transposicao').textContent = textoSemTransposicao;
+        document.getElementById('val-original').textContent         = textoOriginal;
+
+        setTimeout(() => animateStep('step-sem-transposicao'),  80);
+        setTimeout(() => animateStep('step-original'),          320);
+
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      } catch (err) {
+        showError('dec-error', err.message);
+      }
+    }
+
+    /* Allow Enter key on chave input */
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('enc-chave').addEventListener('keydown', e => {
+        if (e.key === 'Enter') encriptar();
+      });
+      document.getElementById('dec-chave').addEventListener('keydown', e => {
+        if (e.key === 'Enter') decriptar();
+      });
+    });
+  </script>
+</body>
+</html>
