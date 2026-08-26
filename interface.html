@@ -792,6 +792,66 @@
         grid-template-columns: 1fr;
       }
     }
+
+    /* ===== EXPLICAÇÃO ===== */
+    .explanation-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .explanation-box {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+    }
+
+    .explanation-box h4 {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .explanation-box p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    .explanation-code {
+      margin-top: 10px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text-primary);
+      line-height: 1.7;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .explanation-formula {
+      margin-top: 10px;
+      padding: 13px 16px;
+      border-radius: 10px;
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13.5px;
+      text-align: center;
+      color: var(--accent-blue);
+    }
+
+    .explanation-note {
+      margin-top: 10px;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
   </style>
 </head>
 
@@ -826,6 +886,9 @@
       </button>
       <button id="tab-dec" class="tab-btn dec" role="tab" onclick="switchTab('dec')">
         🔓 <span>Decriptar</span>
+      </button>
+      <button id="tab-exp" class="tab-btn" role="tab" onclick="switchTab('exp')">
+        📘 <span>Explicação</span>
       </button>
     </div>
 
@@ -962,6 +1025,132 @@
     </div>
 
 
+
+    <!-- ===== EXPLICAÇÃO PANEL ===== -->
+    <div id="panel-exp" class="panel">
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon blue">📘</div>
+          <div>
+            <div class="card-title">Como o algoritmo funciona</div>
+            <div class="card-subtitle">Resumo das etapas de encriptação e decriptação</div>
+          </div>
+        </div>
+
+        <div class="explanation-flow">
+          <div class="explanation-box">
+            <h4>1. Normalização</h4>
+            <p>
+              Antes do processamento, o texto é convertido para maiúsculas, os acentos são removidos,
+              os espaços e números são desconsiderados e somente as letras de A até Z permanecem.
+            </p>
+            <div class="explanation-code">Segurança da Informação
+↓
+SEGURANCADAINFORMACAO</div>
+          </div>
+
+          <div class="explanation-box">
+            <h4>2. Repetição da chave</h4>
+            <p>
+              A chave é repetida automaticamente até acompanhar todas as posições do texto.
+            </p>
+            <div class="explanation-code">Texto:  S E G U R A N C A
+Chave:  R E D E R E D E R
+Índice: 0 1 2 3 4 5 6 7 8</div>
+          </div>
+
+          <div class="explanation-box">
+            <h4>3. Substituição variável</h4>
+            <p>
+              Cada letra é transformada em um valor entre 0 e 25. A nova letra depende do valor
+              da letra original, da letra correspondente da chave e da posição ocupada no texto.
+            </p>
+            <div class="explanation-formula">C = (P + K + i) mod 26</div>
+            <div class="explanation-note">
+              P = letra original · K = letra da chave · i = posição · C = letra cifrada
+            </div>
+
+            <div class="explanation-code">Exemplo da substituição:
+
+Texto: S
+Chave: R
+Posição: 0
+
+S = 18
+R = 17
+
+C = (P + K + i) mod 26
+C = (18 + 17 + 0) mod 26
+C = 35 mod 26
+C = 9
+
+9 = J
+
+Resultado: S → J</div>
+
+            <div class="explanation-code">Primeiras letras de SEGURANCA:
+
+S + R + 0 → 18 + 17 + 0 = 35 → 35 mod 26 = 9  → J
+E + E + 1 →  4 +  4 + 1 =  9 →  9 mod 26 = 9  → J
+G + D + 2 →  6 +  3 + 2 = 11 → 11 mod 26 = 11 → L
+U + E + 3 → 20 +  4 + 3 = 27 → 27 mod 26 = 1  → B</div>
+          </div>
+
+          <div class="explanation-box">
+            <h4>4. Transposição por blocos</h4>
+            <p>
+              Após a substituição, o texto é dividido em blocos. O tamanho de cada bloco é igual
+              ao tamanho da chave. Os blocos ímpares são mantidos e os blocos pares são invertidos.
+            </p>
+            <div class="explanation-code">JJLB | MJWN | Z
+  ↓      ↓     ↓
+JJLB | NWJM | Z
+
+Texto cifrado: JJLBNWJMZ</div>
+          </div>
+
+          <div class="explanation-box">
+            <h4>5. Decriptação</h4>
+            <p>
+              Para recuperar o texto original, o processo é realizado na ordem inversa:
+              primeiro a transposição é desfeita e depois é aplicada a fórmula inversa da substituição.
+            </p>
+            <div class="explanation-formula">P = (C - K - i) mod 26</div>
+            <div class="explanation-code">JJLBNWJMZ
+↓
+JJLBMJWNZ
+↓
+SEGURANCA</div>
+          </div>
+
+          <div class="explanation-box">
+            <h4>6. Resumo</h4>
+            <div class="explanation-code">ENCRIPTAÇÃO
+Texto claro
+↓
+Normalização
+↓
+Substituição variável
+↓
+Transposição alternada
+↓
+Texto cifrado
+
+DECRIPTAÇÃO
+Texto cifrado
+↓
+Reversão da transposição
+↓
+Reversão da substituição
+↓
+Texto claro</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
   </div><!-- /wrapper -->
 
 
@@ -1044,8 +1233,14 @@
     function switchTab(tab) {
       document.getElementById('panel-enc').classList.toggle('active', tab === 'enc');
       document.getElementById('panel-dec').classList.toggle('active', tab === 'dec');
+      document.getElementById('panel-exp').classList.toggle('active', tab === 'exp');
+
       document.getElementById('tab-enc').classList.toggle('active', tab === 'enc');
       document.getElementById('tab-dec').classList.toggle('active', tab === 'dec');
+      document.getElementById('tab-exp').classList.toggle('active', tab === 'exp');
+
+      document.getElementById('tab-enc').classList.toggle('enc', tab === 'enc');
+      document.getElementById('tab-dec').classList.toggle('dec', tab === 'dec');
     }
 
     function showError(id, msg) {
