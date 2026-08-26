@@ -557,6 +557,29 @@
       margin-top: 8px;
       text-align: center;
     }
+    /* ===== PASSWORD WRAP ===== */
+    .pw-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .pw-wrap input {
+      flex: 1;
+      padding-right: 42px;
+    }
+    .eye-btn {
+      position: absolute;
+      right: 10px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      opacity: 0.5;
+      transition: opacity 0.2s;
+      padding: 2px;
+    }
+    .eye-btn:hover { opacity: 1; }
   </style>
 </head>
 <body>
@@ -614,7 +637,10 @@
         <div class="field-group">
           <div class="field">
             <label for="enc-chave">Chave</label>
-            <input id="enc-chave" type="text" placeholder="Ex: CHAVE" />
+            <div class="pw-wrap">
+              <input id="enc-chave" type="password" placeholder="Digite a chave…" autocomplete="off" />
+              <button type="button" class="eye-btn" onclick="toggleChave('enc-chave', this)" title="Mostrar/ocultar chave">👁</button>
+            </div>
           </div>
           <div class="field" style="justify-content:flex-end;">
             <label>&nbsp;</label>
@@ -695,7 +721,10 @@
         <div class="field-group">
           <div class="field">
             <label for="dec-chave">Chave</label>
-            <input id="dec-chave" type="text" placeholder="Ex: CHAVE" />
+            <div class="pw-wrap">
+              <input id="dec-chave" type="password" placeholder="Digite a chave…" autocomplete="off" />
+              <button type="button" class="eye-btn" onclick="toggleChave('dec-chave', this)" title="Mostrar/ocultar chave">👁</button>
+            </div>
           </div>
           <div class="field" style="justify-content:flex-end;">
             <label>&nbsp;</label>
@@ -951,6 +980,20 @@
 
       } catch (err) {
         showError('dec-error', err.message);
+      }
+    }
+
+    /* Toggle visibilidade da chave */
+    function toggleChave(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈';
+        btn.title = 'Ocultar chave';
+      } else {
+        input.type = 'password';
+        btn.textContent = '👁';
+        btn.title = 'Mostrar chave';
       }
     }
 
