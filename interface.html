@@ -625,7 +625,7 @@
           <div class="card-icon cyan">📝</div>
           <div>
             <div class="card-title">Dados de Entrada</div>
-            <div class="card-subtitle">Informe o texto e a chave para encriptação</div>
+            <div class="card-subtitle">Informe o texto para encriptação</div>
           </div>
         </div>
 
@@ -634,21 +634,7 @@
           <textarea id="enc-texto" placeholder="Digite a mensagem que deseja encriptar…"></textarea>
         </div>
 
-        <div class="field-group">
-          <div class="field">
-            <label for="enc-chave">Chave</label>
-            <div class="pw-wrap">
-              <input id="enc-chave" type="password" placeholder="Digite a chave…" autocomplete="off" />
-              <button type="button" class="eye-btn" onclick="toggleChave('enc-chave', this)" title="Mostrar/ocultar chave">👁</button>
-            </div>
-          </div>
-          <div class="field" style="justify-content:flex-end;">
-            <label>&nbsp;</label>
-            <div style="font-size:12px; color: var(--text-muted); line-height:1.5; padding:10px 0;">
-              A chave pode conter qualquer letra.<br>Espaços e acentos são ignorados.
-            </div>
-          </div>
-        </div>
+
 
         <div class="error-msg" id="enc-error">⚠️ <span id="enc-error-msg"></span></div>
 
@@ -709,7 +695,7 @@
           <div class="card-icon teal">🔍</div>
           <div>
             <div class="card-title">Dados de Entrada</div>
-            <div class="card-subtitle">Informe o texto cifrado e a chave para decriptação</div>
+            <div class="card-subtitle">Informe o texto cifrado para decriptação</div>
           </div>
         </div>
 
@@ -718,21 +704,7 @@
           <textarea id="dec-texto" placeholder="Cole aqui o texto cifrado…"></textarea>
         </div>
 
-        <div class="field-group">
-          <div class="field">
-            <label for="dec-chave">Chave</label>
-            <div class="pw-wrap">
-              <input id="dec-chave" type="password" placeholder="Digite a chave…" autocomplete="off" />
-              <button type="button" class="eye-btn" onclick="toggleChave('dec-chave', this)" title="Mostrar/ocultar chave">👁</button>
-            </div>
-          </div>
-          <div class="field" style="justify-content:flex-end;">
-            <label>&nbsp;</label>
-            <div style="font-size:12px; color: var(--text-muted); line-height:1.5; padding:10px 0;">
-              Use a mesma chave utilizada<br>na encriptação original.
-            </div>
-          </div>
-        </div>
+
 
         <div class="error-msg" id="dec-error">⚠️ <span id="dec-error-msg"></span></div>
 
@@ -899,7 +871,6 @@
 
     function limparEnc() {
       document.getElementById('enc-texto').value = '';
-      document.getElementById('enc-chave').value = '';
       hideError('enc-error');
       document.getElementById('enc-result-card').style.display = 'none';
       ['step-normalizado','step-substituido','step-cifrado'].forEach(id => {
@@ -909,7 +880,6 @@
 
     function limparDec() {
       document.getElementById('dec-texto').value = '';
-      document.getElementById('dec-chave').value = '';
       hideError('dec-error');
       document.getElementById('dec-result-card').style.display = 'none';
       ['step-sem-transposicao','step-original'].forEach(id => {
@@ -924,7 +894,7 @@
     function encriptar() {
       hideError('enc-error');
       const texto = document.getElementById('enc-texto').value;
-      const chave = document.getElementById('enc-chave').value;
+      const chave = "CHAVE";
 
       try {
         const { textoNormalizado, textoSubstituido, textoCifrado } = encriptarAlgo(texto, chave);
@@ -958,7 +928,7 @@
     function decriptar() {
       hideError('dec-error');
       const texto = document.getElementById('dec-texto').value;
-      const chave = document.getElementById('dec-chave').value;
+      const chave = "CHAVE";
 
       try {
         const { textoSemTransposicao, textoOriginal } = decriptarAlgo(texto, chave);
@@ -983,29 +953,16 @@
       }
     }
 
-    /* Toggle visibilidade da chave */
-    function toggleChave(inputId, btn) {
-      const input = document.getElementById(inputId);
-      if (input.type === 'password') {
-        input.type = 'text';
-        btn.textContent = '🙈';
-        btn.title = 'Ocultar chave';
-      } else {
-        input.type = 'password';
-        btn.textContent = '👁';
-        btn.title = 'Mostrar chave';
-      }
-    }
-
-    /* Allow Enter key on chave input */
+    /* Allow Enter key on texto textarea */
     document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('enc-chave').addEventListener('keydown', e => {
-        if (e.key === 'Enter') encriptar();
+      document.getElementById('enc-texto').addEventListener('keydown', e => {
+        if (e.key === 'Enter' && e.ctrlKey) encriptar();
       });
-      document.getElementById('dec-chave').addEventListener('keydown', e => {
-        if (e.key === 'Enter') decriptar();
+      document.getElementById('dec-texto').addEventListener('keydown', e => {
+        if (e.key === 'Enter' && e.ctrlKey) decriptar();
       });
     });
+
   </script>
 </body>
 </html>
