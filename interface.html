@@ -1,42 +1,50 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CriptoCipher — Encriptador & Decriptador</title>
-  <meta name="description" content="Interface web para encriptação e decriptação de mensagens usando cifra de Vigenère com transposição de blocos." />
+  <meta name="description"
+    content="Interface web para encriptação e decriptação de mensagens usando cifra de Vigenère com transposição de blocos." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet" />
   <style>
     /* ===== RESET & BASE ===== */
-    *, *::before, *::after {
+    *,
+    *::before,
+    *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
 
     :root {
-      --bg-deep:      #f0f4f8;
-      --bg-dark:      #ffffff;
-      --bg-card:      #ffffff;
-      --bg-card-alt:  #f8fafc;
-      --border:       rgba(99, 132, 180, 0.18);
+      --bg-deep: #f0f4f8;
+      --bg-dark: #ffffff;
+      --bg-card: #ffffff;
+      --bg-card-alt: #f8fafc;
+      --border: rgba(99, 132, 180, 0.18);
       --border-focus: rgba(56, 130, 220, 0.5);
-      --accent-cyan:  #0ea5e9;
-      --accent-blue:  #4f46e5;
-      --accent-teal:  #0d9488;
-      --accent-rose:  #e11d48;
+      --accent-cyan: #0ea5e9;
+      --accent-blue: #4f46e5;
+      --accent-teal: #0d9488;
+      --accent-rose: #e11d48;
       --accent-green: #16a34a;
       --text-primary: #0f172a;
       --text-secondary: #475569;
-      --text-muted:   #94a3b8;
-      --glow-cyan:    0 0 20px rgba(14, 165, 233, 0.15);
-      --glow-blue:    0 0 20px rgba(79, 70, 229, 0.15);
-      --glow-teal:    0 0 20px rgba(13, 148, 136, 0.15);
+      --text-muted: #94a3b8;
+      --glow-cyan: 0 0 20px rgba(14, 165, 233, 0.15);
+      --glow-blue: 0 0 20px rgba(79, 70, 229, 0.15);
+      --glow-teal: 0 0 20px rgba(13, 148, 136, 0.15);
     }
 
-    html { scroll-behavior: smooth; }
+    html {
+      scroll-behavior: smooth;
+    }
 
     body {
       font-family: 'Inter', sans-serif;
@@ -66,29 +74,52 @@
       pointer-events: none;
       z-index: 0;
     }
+
     .bg-glow-1 {
-      width: 500px; height: 500px;
+      width: 500px;
+      height: 500px;
       background: radial-gradient(circle, rgba(14, 165, 233, 0.08) 0%, transparent 70%);
-      top: -100px; left: -100px;
+      top: -100px;
+      left: -100px;
       animation: float1 12s ease-in-out infinite alternate;
     }
+
     .bg-glow-2 {
-      width: 400px; height: 400px;
+      width: 400px;
+      height: 400px;
       background: radial-gradient(circle, rgba(79, 70, 229, 0.07) 0%, transparent 70%);
-      bottom: -80px; right: -80px;
+      bottom: -80px;
+      right: -80px;
       animation: float2 10s ease-in-out infinite alternate;
     }
+
     .bg-glow-3 {
-      width: 300px; height: 300px;
+      width: 300px;
+      height: 300px;
       background: radial-gradient(circle, rgba(13, 148, 136, 0.06) 0%, transparent 70%);
-      top: 50%; left: 50%;
+      top: 50%;
+      left: 50%;
       transform: translate(-50%, -50%);
       animation: float3 15s ease-in-out infinite alternate;
     }
 
-    @keyframes float1 { to { transform: translate(30px, 40px); } }
-    @keyframes float2 { to { transform: translate(-30px, -20px); } }
-    @keyframes float3 { to { transform: translate(-50%, -60%); } }
+    @keyframes float1 {
+      to {
+        transform: translate(30px, 40px);
+      }
+    }
+
+    @keyframes float2 {
+      to {
+        transform: translate(-30px, -20px);
+      }
+    }
+
+    @keyframes float3 {
+      to {
+        transform: translate(-50%, -60%);
+      }
+    }
 
     /* ===== LAYOUT ===== */
     .wrapper {
@@ -113,18 +144,28 @@
     }
 
     .logo-icon {
-      width: 48px; height: 48px;
+      width: 48px;
+      height: 48px;
       border-radius: 12px;
       background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 22px;
-      box-shadow: var(--glow-cyan), inset 0 1px 0 rgba(255,255,255,0.1);
+      box-shadow: var(--glow-cyan), inset 0 1px 0 rgba(255, 255, 255, 0.1);
       animation: pulse-logo 3s ease-in-out infinite;
     }
 
     @keyframes pulse-logo {
-      0%, 100% { box-shadow: var(--glow-cyan), inset 0 1px 0 rgba(255,255,255,0.1); }
-      50%       { box-shadow: 0 0 35px rgba(56,189,248,0.45), inset 0 1px 0 rgba(255,255,255,0.1); }
+
+      0%,
+      100% {
+        box-shadow: var(--glow-cyan), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      }
+
+      50% {
+        box-shadow: 0 0 35px rgba(56, 189, 248, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      }
     }
 
     .logo-text {
@@ -163,9 +204,24 @@
       letter-spacing: 0.5px;
       border: 1px solid;
     }
-    .badge-cyan  { color: var(--accent-cyan); border-color: rgba(56,189,248,0.25); background: rgba(56,189,248,0.07); }
-    .badge-blue  { color: var(--accent-blue); border-color: rgba(99,102,241,0.25); background: rgba(99,102,241,0.07); }
-    .badge-teal  { color: var(--accent-teal); border-color: rgba(45,212,191,0.25); background: rgba(45,212,191,0.07); }
+
+    .badge-cyan {
+      color: var(--accent-cyan);
+      border-color: rgba(56, 189, 248, 0.25);
+      background: rgba(56, 189, 248, 0.07);
+    }
+
+    .badge-blue {
+      color: var(--accent-blue);
+      border-color: rgba(99, 102, 241, 0.25);
+      background: rgba(99, 102, 241, 0.07);
+    }
+
+    .badge-teal {
+      color: var(--accent-teal);
+      border-color: rgba(45, 212, 191, 0.25);
+      background: rgba(45, 212, 191, 0.07);
+    }
 
     /* ===== TABS ===== */
     .tabs {
@@ -198,7 +254,7 @@
 
     .tab-btn:hover:not(.active) {
       color: var(--text-primary);
-      background: rgba(255,255,255,0.04);
+      background: rgba(255, 255, 255, 0.04);
     }
 
     .tab-btn.active {
@@ -208,12 +264,12 @@
 
     .tab-btn.active.enc {
       background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
-      box-shadow: 0 4px 15px rgba(56,189,248,0.3);
+      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
     }
 
     .tab-btn.active.dec {
       background: linear-gradient(135deg, var(--accent-teal), #34d399);
-      box-shadow: 0 4px 15px rgba(45,212,191,0.3);
+      box-shadow: 0 4px 15px rgba(45, 212, 191, 0.3);
     }
 
     /* ===== CARDS ===== */
@@ -221,11 +277,21 @@
       display: none;
       animation: fadeIn 0.3s ease;
     }
-    .panel.active { display: block; }
+
+    .panel.active {
+      display: block;
+    }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .card {
@@ -234,11 +300,14 @@
       border-radius: 18px;
       padding: 28px;
       margin-bottom: 20px;
-      box-shadow: 0 2px 12px rgba(15, 23, 42, 0.07), 0 1px 3px rgba(15,23,42,0.05);
+      box-shadow: 0 2px 12px rgba(15, 23, 42, 0.07), 0 1px 3px rgba(15, 23, 42, 0.05);
       transition: border-color 0.3s, box-shadow 0.3s;
     }
 
-    .card:hover { border-color: rgba(14,165,233,0.35); box-shadow: 0 4px 20px rgba(14,165,233,0.1); }
+    .card:hover {
+      border-color: rgba(14, 165, 233, 0.35);
+      box-shadow: 0 4px 20px rgba(14, 165, 233, 0.1);
+    }
 
     .card-header {
       display: flex;
@@ -248,16 +317,34 @@
     }
 
     .card-icon {
-      width: 36px; height: 36px;
+      width: 36px;
+      height: 36px;
       border-radius: 9px;
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 16px;
     }
-    .card-icon.cyan { background: rgba(56,189,248,0.12); }
-    .card-icon.teal { background: rgba(45,212,191,0.12); }
-    .card-icon.blue { background: rgba(99,102,241,0.12); }
-    .card-icon.rose { background: rgba(244,63,94,0.12); }
-    .card-icon.green{ background: rgba(74,222,128,0.12); }
+
+    .card-icon.cyan {
+      background: rgba(56, 189, 248, 0.12);
+    }
+
+    .card-icon.teal {
+      background: rgba(45, 212, 191, 0.12);
+    }
+
+    .card-icon.blue {
+      background: rgba(99, 102, 241, 0.12);
+    }
+
+    .card-icon.rose {
+      background: rgba(244, 63, 94, 0.12);
+    }
+
+    .card-icon.green {
+      background: rgba(74, 222, 128, 0.12);
+    }
 
     .card-title {
       font-size: 15px;
@@ -280,7 +367,9 @@
     }
 
     @media (max-width: 600px) {
-      .field-group { grid-template-columns: 1fr; }
+      .field-group {
+        grid-template-columns: 1fr;
+      }
     }
 
     .field {
@@ -289,7 +378,9 @@
       gap: 8px;
     }
 
-    .field.full { grid-column: 1 / -1; }
+    .field.full {
+      grid-column: 1 / -1;
+    }
 
     label {
       font-size: 12.5px;
@@ -299,7 +390,8 @@
       letter-spacing: 0.8px;
     }
 
-    textarea, input[type="text"] {
+    textarea,
+    input[type="text"] {
       width: 100%;
       background: #f8fafc;
       border: 1px solid var(--border);
@@ -313,14 +405,18 @@
       resize: vertical;
     }
 
-    textarea { min-height: 110px; }
-
-    textarea:focus, input[type="text"]:focus {
-      border-color: var(--border-focus);
-      box-shadow: 0 0 0 3px rgba(56,189,248,0.08);
+    textarea {
+      min-height: 110px;
     }
 
-    textarea::placeholder, input::placeholder {
+    textarea:focus,
+    input[type="text"]:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.08);
+    }
+
+    textarea::placeholder,
+    input::placeholder {
       color: var(--text-muted);
       font-family: 'Inter', sans-serif;
     }
@@ -348,23 +444,28 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: rgba(255,255,255,0);
+      background: rgba(255, 255, 255, 0);
       transition: background 0.2s;
     }
 
-    .btn:hover::after { background: rgba(255,255,255,0.07); }
-    .btn:active { transform: scale(0.97); }
+    .btn:hover::after {
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
 
     .btn-enc {
       background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
       color: #fff;
-      box-shadow: 0 4px 20px rgba(56,189,248,0.3);
+      box-shadow: 0 4px 20px rgba(56, 189, 248, 0.3);
     }
 
     .btn-dec {
       background: linear-gradient(135deg, var(--accent-teal), #34d399);
       color: #082119;
-      box-shadow: 0 4px 20px rgba(45,212,191,0.3);
+      box-shadow: 0 4px 20px rgba(45, 212, 191, 0.3);
     }
 
     .btn:disabled {
@@ -387,7 +488,11 @@
       padding: 12px 18px;
       font-size: 13px;
     }
-    .btn-ghost:hover { border-color: var(--border-focus); color: var(--text-primary); }
+
+    .btn-ghost:hover {
+      border-color: var(--border-focus);
+      color: var(--text-primary);
+    }
 
     /* ===== STEPS PIPELINE ===== */
     .pipeline {
@@ -412,9 +517,20 @@
       transition: opacity 0.4s ease, transform 0.4s ease, border-color 0.3s;
     }
 
-    .step.done.enc-step  { border-color: rgba(56,189,248,0.35); box-shadow: var(--glow-cyan); }
-    .step.done.dec-step  { border-color: rgba(45,212,191,0.35); box-shadow: var(--glow-teal); }
-    .step.done.final-step{ border-color: rgba(99,102,241,0.45); box-shadow: var(--glow-blue); }
+    .step.done.enc-step {
+      border-color: rgba(56, 189, 248, 0.35);
+      box-shadow: var(--glow-cyan);
+    }
+
+    .step.done.dec-step {
+      border-color: rgba(45, 212, 191, 0.35);
+      box-shadow: var(--glow-teal);
+    }
+
+    .step.done.final-step {
+      border-color: rgba(99, 102, 241, 0.45);
+      box-shadow: var(--glow-blue);
+    }
 
     .step-label {
       font-size: 11px;
@@ -427,9 +543,17 @@
       gap: 6px;
     }
 
-    .step-label.enc-color  { color: var(--accent-cyan); }
-    .step-label.dec-color  { color: var(--accent-teal); }
-    .step-label.blue-color { color: var(--accent-blue); }
+    .step-label.enc-color {
+      color: var(--accent-cyan);
+    }
+
+    .step-label.dec-color {
+      color: var(--accent-teal);
+    }
+
+    .step-label.blue-color {
+      color: var(--accent-blue);
+    }
 
     .step-value {
       font-family: 'JetBrains Mono', monospace;
@@ -456,8 +580,16 @@
       margin-left: auto;
       flex-shrink: 0;
     }
-    .copy-btn:hover { color: var(--accent-cyan); border-color: var(--accent-cyan); }
-    .copy-btn.copied { color: var(--accent-green); border-color: var(--accent-green); }
+
+    .copy-btn:hover {
+      color: var(--accent-cyan);
+      border-color: var(--accent-cyan);
+    }
+
+    .copy-btn.copied {
+      color: var(--accent-green);
+      border-color: var(--accent-green);
+    }
 
     .step-header {
       display: flex;
@@ -468,8 +600,8 @@
 
     /* ===== ERROR ===== */
     .error-msg {
-      background: rgba(244,63,94,0.1);
-      border: 1px solid rgba(244,63,94,0.3);
+      background: rgba(244, 63, 94, 0.1);
+      border: 1px solid rgba(244, 63, 94, 0.3);
       color: #fca5a5;
       border-radius: 10px;
       padding: 12px 16px;
@@ -478,20 +610,37 @@
       margin-top: 16px;
       animation: fadeIn 0.25s ease;
     }
-    .error-msg.show { display: flex; align-items: center; gap: 8px; }
+
+    .error-msg.show {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
     /* ===== LOADING SPINNER ===== */
     .spinner {
-      width: 16px; height: 16px;
-      border: 2px solid rgba(255,255,255,0.3);
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
       border-top-color: #fff;
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
       display: none;
     }
-    .btn.loading .spinner { display: block; }
-    .btn.loading .btn-label { opacity: 0.7; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .btn.loading .spinner {
+      display: block;
+    }
+
+    .btn.loading .btn-label {
+      opacity: 0.7;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
 
     /* ===== INFO PANEL ===== */
     .algo-info {
@@ -524,14 +673,27 @@
     }
 
     .algo-dot {
-      width: 8px; height: 8px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       margin-top: 5px;
       flex-shrink: 0;
     }
-    .dot-cyan  { background: var(--accent-cyan);  box-shadow: 0 0 8px var(--accent-cyan); }
-    .dot-blue  { background: var(--accent-blue);  box-shadow: 0 0 8px var(--accent-blue); }
-    .dot-teal  { background: var(--accent-teal);  box-shadow: 0 0 8px var(--accent-teal); }
+
+    .dot-cyan {
+      background: var(--accent-cyan);
+      box-shadow: 0 0 8px var(--accent-cyan);
+    }
+
+    .dot-blue {
+      background: var(--accent-blue);
+      box-shadow: 0 0 8px var(--accent-blue);
+    }
+
+    .dot-teal {
+      background: var(--accent-teal);
+      box-shadow: 0 0 8px var(--accent-teal);
+    }
 
     .algo-item-title {
       font-size: 13px;
@@ -539,6 +701,7 @@
       color: var(--text-primary);
       margin-bottom: 3px;
     }
+
     .algo-item-desc {
       font-size: 12px;
       color: var(--text-muted);
@@ -557,16 +720,19 @@
       margin-top: 8px;
       text-align: center;
     }
+
     /* ===== PASSWORD WRAP ===== */
     .pw-wrap {
       position: relative;
       display: flex;
       align-items: center;
     }
+
     .pw-wrap input {
       flex: 1;
       padding-right: 42px;
     }
+
     .eye-btn {
       position: absolute;
       right: 10px;
@@ -579,9 +745,13 @@
       transition: opacity 0.2s;
       padding: 2px;
     }
-    .eye-btn:hover { opacity: 1; }
+
+    .eye-btn:hover {
+      opacity: 1;
+    }
   </style>
 </head>
+
 <body>
 
   <!-- Background decorations -->
@@ -658,17 +828,11 @@
         </div>
 
         <div class="pipeline">
-          <div class="step enc-step" id="step-normalizado">
-            <div class="step-header">
-              <span class="step-label enc-color">① Texto Normalizado</span>
-              <button class="copy-btn" onclick="copiar('val-normalizado', this)">📋 Copiar</button>
-            </div>
-            <div class="step-value" id="val-normalizado">—</div>
-          </div>
+
 
           <div class="step final-step" id="step-cifrado">
             <div class="step-header">
-              <span class="step-label blue-color">② Texto Cifrado Final</span>
+              <span class="step-label blue-color">Texto Cifrado Final</span>
               <button class="copy-btn" onclick="copiar('val-cifrado', this)">📋 Copiar</button>
             </div>
             <div class="step-value" id="val-cifrado">—</div>
@@ -763,8 +927,8 @@
       for (let i = 0; i < texto.length; i++) {
         const letraTexto = texto[i];
         const letraChave = chave[i % chave.length];
-        const valTexto   = letraTexto.charCodeAt(0) - 65;
-        const valChave   = letraChave.charCodeAt(0) - 65;
+        const valTexto = letraTexto.charCodeAt(0) - 65;
+        const valChave = letraChave.charCodeAt(0) - 65;
         const valCifrado = ((valTexto + valChave + i) % 26 + 26) % 26;
         resultado += String.fromCharCode(valCifrado + 65);
       }
@@ -787,10 +951,10 @@
       let resultado = "";
       for (let i = 0; i < texto.length; i++) {
         const letraCifrada = texto[i];
-        const letraChave   = chave[i % chave.length];
-        const valCifrado   = letraCifrada.charCodeAt(0) - 65;
-        const valChave     = letraChave.charCodeAt(0) - 65;
-        const valOriginal  = ((valCifrado - valChave - i) % 26 + 26) % 26;
+        const letraChave = chave[i % chave.length];
+        const valCifrado = letraCifrada.charCodeAt(0) - 65;
+        const valChave = letraChave.charCodeAt(0) - 65;
+        const valOriginal = ((valCifrado - valChave - i) % 26 + 26) % 26;
         resultado += String.fromCharCode(valOriginal + 65);
       }
       return resultado;
@@ -802,17 +966,17 @@
       if (!chave) throw new Error("A chave precisa possuir pelo menos uma letra.");
       if (!texto) throw new Error("O texto original não pode ficar vazio.");
       const textoSubstituido = substituir(texto, chave);
-      const textoCifrado     = transpor(textoSubstituido, chave.length);
+      const textoCifrado = transpor(textoSubstituido, chave.length);
       return { textoNormalizado: texto, textoSubstituido, textoCifrado };
     }
 
     function decriptarAlgo(textoCifrado, chave) {
       textoCifrado = normalizar(textoCifrado);
-      chave        = normalizar(chave);
-      if (!chave)       throw new Error("A chave precisa possuir pelo menos uma letra.");
+      chave = normalizar(chave);
+      if (!chave) throw new Error("A chave precisa possuir pelo menos uma letra.");
       if (!textoCifrado) throw new Error("O texto cifrado não pode ficar vazio.");
       const textoSemTransposicao = transpor(textoCifrado, chave.length);
-      const textoOriginal        = desfazerSubstituicao(textoSemTransposicao, chave);
+      const textoOriginal = desfazerSubstituicao(textoSemTransposicao, chave);
       return { textoCifrado, textoSemTransposicao, textoOriginal };
     }
 
@@ -865,16 +1029,14 @@
       document.getElementById('enc-texto').value = '';
       hideError('enc-error');
       document.getElementById('enc-result-card').style.display = 'none';
-      ['step-normalizado','step-cifrado'].forEach(id => {
-        document.getElementById(id).classList.remove('done');
-      });
+      document.getElementById('step-cifrado').classList.remove('done');
     }
 
     function limparDec() {
       document.getElementById('dec-texto').value = '';
       hideError('dec-error');
       document.getElementById('dec-result-card').style.display = 'none';
-      ['step-sem-transposicao','step-original'].forEach(id => {
+      ['step-sem-transposicao', 'step-original'].forEach(id => {
         document.getElementById(id).classList.remove('done');
       });
     }
@@ -889,24 +1051,20 @@
       const chave = "CHAVE";
 
       try {
-        const { textoNormalizado, textoCifrado } = encriptarAlgo(texto, chave);
+        const { textoCifrado } = encriptarAlgo(texto, chave);
 
         // Show result card
         const card = document.getElementById('enc-result-card');
         card.style.display = 'block';
 
-        // Reset step animations
-        ['step-normalizado','step-cifrado'].forEach(id => {
-          document.getElementById(id).classList.remove('done');
-        });
+        // Reset step animation
+        document.getElementById('step-cifrado').classList.remove('done');
 
-        // Populate values
-        document.getElementById('val-normalizado').textContent = textoNormalizado;
-        document.getElementById('val-cifrado').textContent     = textoCifrado;
+        // Populate value
+        document.getElementById('val-cifrado').textContent = textoCifrado;
 
-        // Animate steps with delay
-        setTimeout(() => animateStep('step-normalizado'),  80);
-        setTimeout(() => animateStep('step-cifrado'),     280);
+        // Animate step
+        setTimeout(() => animateStep('step-cifrado'), 80);
 
         card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
@@ -926,15 +1084,15 @@
         const card = document.getElementById('dec-result-card');
         card.style.display = 'block';
 
-        ['step-sem-transposicao','step-original'].forEach(id => {
+        ['step-sem-transposicao', 'step-original'].forEach(id => {
           document.getElementById(id).classList.remove('done');
         });
 
         document.getElementById('val-sem-transposicao').textContent = textoSemTransposicao;
-        document.getElementById('val-original').textContent         = textoOriginal;
+        document.getElementById('val-original').textContent = textoOriginal;
 
-        setTimeout(() => animateStep('step-sem-transposicao'),  80);
-        setTimeout(() => animateStep('step-original'),          320);
+        setTimeout(() => animateStep('step-sem-transposicao'), 80);
+        setTimeout(() => animateStep('step-original'), 320);
 
         card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
@@ -955,4 +1113,5 @@
 
   </script>
 </body>
+
 </html>
